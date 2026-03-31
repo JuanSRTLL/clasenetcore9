@@ -1,4 +1,5 @@
-// — Importamos el atributo [OracleColumn] que acabamos de crear
+// !! OracleColumnAttribute.cs — importamos la etiqueta [OracleColumn] que definimos en Attributes/OracleColumnAttribute.cs
+// !! Sin este import, no podríamos usar GetCustomAttribute<OracleColumnAttribute>() más abajo
 using BaseAPI.Infrastructure.Services.Oracle.Core.Attributes;
 // — Importamos el sistema de logging para registrar advertencias
 using Microsoft.Extensions.Logging;
@@ -100,12 +101,15 @@ public class OracleMapper
             // — Obtenemos el nombre de la columna en la posición i (ej: "ID_ESTUDIANTE")
             var columnName = reader.GetName(i);
 
-            // — PRIORIDAD 1: Buscar una propiedad que tenga [OracleColumn("ID_ESTUDIANTE")]
+            // !! PRIORIDAD 1 — OracleColumnAttribute.cs se usa AQUÍ
+            // !! Busca una propiedad que tenga [OracleColumn("ID_ESTUDIANTE")] (definido en OracleColumnAttribute.cs)
             var propByAttr = properties.FirstOrDefault(p =>
             {
-                // — Leemos el atributo [OracleColumn] de la propiedad (si tiene)
+                // !! OracleColumnAttribute.cs — GetCustomAttribute lee la etiqueta [OracleColumn] de la propiedad
+                // !! Ejemplo: EstudianteOracleRow tiene [OracleColumn("ID_ESTUDIANTE")] sobre IdEstudiante
+                // !!          → attr.ColumnName vale "ID_ESTUDIANTE"
                 var attr = p.GetCustomAttribute<OracleColumnAttribute>();
-                // — Comparamos el nombre del atributo con el nombre de la columna (ignorando mayúsculas)
+                // !! OracleColumnAttribute.cs — attr.ColumnName es la propiedad que definimos en ese archivo
                 return attr != null &&
                        string.Equals(attr.ColumnName, columnName, StringComparison.OrdinalIgnoreCase);
             });
