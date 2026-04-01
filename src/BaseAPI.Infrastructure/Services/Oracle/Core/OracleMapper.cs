@@ -26,7 +26,18 @@ public class OracleMapper
         _logger = logger;
     }
 
-    // — Método principal: lee TODAS las filas del reader y retorna una lista de objetos T
+    // — Método principal: es el ÚNICO método público de esta clase
+    // — Es "principal" porque es el punto de entrada que otros archivos llaman desde afuera
+    // — OracleExecutor.cs lo llama así: await _mapper.MapAsync<EstudianteOracleRow>(reader)
+    // — Nadie llama directamente a BuildColumnMappings, NormalizeColumnName ni ConvertOracleValue
+    // — Esos 3 métodos son private — solo existen para que MapAsync los use internamente
+    // —
+    // — Flujo dentro de MapAsync:
+    // —   1. Llama a BuildColumnMappings()    → arma el diccionario columna → propiedad (usa OracleColumnAttribute.cs)
+    // —   2. Lee cada fila del reader         → recorre los resultados de Oracle
+    // —   3. Llama a ConvertOracleValue()     → convierte OracleDecimal/OracleString a int/string de C#
+    // —   4. Retorna List<T>                  → la lista de objetos ya mapeados
+    // —
     // — "where T : class, new()" significa: T debe ser una clase y tener constructor vacío
     public async Task<List<T>> MapAsync<T>(
         OracleDataReader reader,
@@ -42,10 +53,10 @@ public class OracleMapper
             .Where(p => p.CanWrite)
             .ToList();
 
-        // — Construimos un diccionario que vincula cada columna de Oracle con una propiedad de C#
+        // — PASO 1 del flujo: Llama a BuildColumnMappings() → arma el diccionario columna → propiedad (usa OracleColumnAttribute.cs)
         var columnMappings = BuildColumnMappings(reader, properties);
 
-        // — Leemos fila por fila del reader (como leer un Excel línea por línea)
+        // — PASO 2 del flujo: Lee cada fila del reader → recorre los resultados de Oracle
         while (await reader.ReadAsync(cancellationToken))
         {
             // — Para cada fila, creamos un nuevo objeto vacío de tipo T
@@ -61,7 +72,7 @@ public class OracleMapper
                     {
                         // — Leemos el valor de la columna en esa fila
                         var value = reader.GetValue(columnIndex);
-                        // — Convertimos el tipo de Oracle (OracleDecimal, etc.) al tipo de C# (int, string, etc.)
+                        // — PASO 3 del flujo: Llama a ConvertOracleValue() → convierte OracleDecimal/OracleString a int/string de C#
                         var convertedValue = ConvertOracleValue(value, property.PropertyType);
                         // — Asignamos el valor convertido a la propiedad del objeto C#
                         property.SetValue(item, convertedValue);
@@ -80,7 +91,7 @@ public class OracleMapper
             results.Add(item);
         }
 
-        // — Retornamos la lista completa de objetos mapeados
+        // — PASO 4 del flujo: Retorna List<T> → la lista de objetos ya mapeados
         return results;
     }
 
