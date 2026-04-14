@@ -1,30 +1,133 @@
-// — Creamos el builder: configura los servicios antes de arrancar el servidor
+using System.Text.Json.Serialization;
+using BaseAPI.API.Middelware;
+using BaseAPI.Application;
+using BaseAPI.Infrastructure;
+using Microsoft.OpenApi.Models;
+
+// ============================================================
+// Program.cs — Punto de entrada de la aplicación ASP.NET Core
+// ============================================================
+// Aquí se configura TODO lo que necesita la API para funcionar:
+// 1. Servicios (DI Container)
+// 2. Middleware Pipeline (cómo se procesan las peticiones)
+// 3. Swagger para pruebas
+// 4. CORS para permitir requests del frontend
+// ============================================================
+
 var builder = WebApplication.CreateBuilder(args);
 
-// — Registramos los controllers (clases que reciben peticiones HTTP)
-builder.Services.AddControllers();
+// ============================================================
+// SERVICIOS — Registro en el contenedor de Dependency Injection
+// ============================================================
 
-// ═══════════════════════════════════════════════════════════════
-// NOTA: En clases posteriores se agregarán aquí:
-//   Swagger (Clase 3)                         → Para probar la API visualmente
-//   CORS (Clase 3)                            → Para permitir peticiones desde un frontend
-//   JSON Options (Clase 3)                    → Para configurar serialización
-//   AddApplication() (Clase 2)                → MediatR y validadores
-//   AddInfrastructureServices() (Clase 4)     → Oracle y persistencia
-// ═══════════════════════════════════════════════════════════════
+// Configurar controladores con opciones de serialización JSON
 
-// — Construimos la aplicación con los servicios registrados
+
+// --- REEMPLAZAR: la línea "builder.Services.AddControllers();" se cambia por esto ---
+// — AddControllers(): escanea el proyecto y registra todos los Controllers
+// —   (EstudiantesController, EstadisticasController, etc.)
+// — AddJsonOptions(): configura cómo C# serializa los objetos a JSON
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // — WhenWritingNull: si una propiedad es null, NO la incluye en el JSON
+        // — Ejemplo: si Correo es null → no aparece "correo": null en el JSON
+        // — Resultado: JSON más limpio y liviano
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
+// ============================================================
+// SWAGGER — Interfaz visual para probar la API
+// ============================================================
+// Swagger genera documentación automática de todos los endpoints
+// y permite probarlos directamente desde el navegador.
+// Acceso: http://localhost:5000/swagger
+// ============================================================
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "API Sistema Universitario",
+        Version = "v1",
+        Description = "API RESTful con Clean Architecture, CQRS y Oracle."
+    });
+
+    // Incluir comentarios XML de los controllers (summary, remarks, etc.)
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
+
+// ============================================================
+// CORS — Cross-Origin Resource Sharing
+// ============================================================
+// Permite que un frontend en otro dominio (ej: localhost:3000)
+// pueda hacer peticiones a esta API (ej: localhost:5000).
+// Sin CORS, el navegador bloquea las peticiones por seguridad.
+// ============================================================
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()    // Permitir cualquier origen (para clase)
+              .AllowAnyMethod()    // Permitir GET, POST, PUT, DELETE, etc.
+              .AllowAnyHeader();   // Permitir cualquier header
+    });
+});
+
+// ============================================================
+// CAPAS DE LA APLICACIÓN — Registro de servicios por capa
+// ============================================================
+// Cada capa tiene su propio método de extensión AddXxx() que registra
+// sus servicios en el contenedor DI. Esto mantiene Program.cs limpio.
+// ============================================================
+
+// Application Layer: MediatR, FluentValidation, Behaviors
+builder.Services.AddApplication();
+
+// Infrastructure Layer: Oracle, Repositories
+//builder.Services.AddInfrastructureServices(builder.Configuration);
+
+// ============================================================
+// BUILD — Construir la aplicación
+// ============================================================
+
 var app = builder.Build();
 
-// ═══════════════════════════════════════════════════════════════
-// NOTA: En Clase 3 se agregará aquí:
-//   app.UseMiddleware<ExceptionHandlingMiddleware>();
-//   app.UseSwagger() / app.UseSwaggerUI();
-//   app.UseCors("AllowAll");
-// ═══════════════════════════════════════════════════════════════
+// ============================================================
+// MIDDLEWARE PIPELINE — Orden de procesamiento de cada request
+// ============================================================
 
-// — Mapear los controllers: conecta las rutas HTTP con los métodos de los controllers
+// 1. EXCEPCIÓN HANDLING — Atrapar cualquier excepción no controlada
+app.UseMiddleware<ExceptionHandingMiddelware>();
+
+// 2. SWAGGER — Solo disponible en desarrollo
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Sistema Universitario v1");
+        c.DocumentTitle = "API Sistema Universitario - Swagger";
+        c.RoutePrefix = "swagger";
+        c.DefaultModelsExpandDepth(-1);
+        c.DisplayRequestDuration();
+    });
+}
+
+// 3. CORS
+app.UseCors("AllowAll");
+
+// 4. CONTROLLERS — Mapear las rutas a los controllers
 app.MapControllers();
 
-// — Arrancar el servidor y escuchar peticiones
+// ============================================================
+// RUN — Iniciar el servidor
+// ============================================================
 app.Run();

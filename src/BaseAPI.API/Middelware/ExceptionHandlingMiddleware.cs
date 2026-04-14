@@ -53,7 +53,7 @@ namespace BaseAPI.API.Middelware
                 ArgumentException argEx => (StatusCodes.Status400BadRequest,
                 argEx.Message),
 
-              => (StatusCodes.Status500InternalServerError,
+              _=> (StatusCodes.Status500InternalServerError,
               "Ocurrio un error interno. Contacte  al administrador")
 
             };
@@ -66,7 +66,6 @@ namespace BaseAPI.API.Middelware
 
             await context.Response.WriteAsJsonAsync(response, jsonOptions);
         }
-      
 
     }
 }
