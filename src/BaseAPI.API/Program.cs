@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using BaseAPI.API.Middelware;
+
 using BaseAPI.Application;
 using BaseAPI.Infrastructure;
 using Microsoft.OpenApi.Models;
@@ -92,7 +93,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplication();
 
 // Infrastructure Layer: Oracle, Repositories
-//builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddInfraestructureServices(builder.Configuration);
 
 // ============================================================
 // BUILD — Construir la aplicación

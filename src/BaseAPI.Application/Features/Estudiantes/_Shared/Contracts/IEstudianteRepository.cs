@@ -20,6 +20,6 @@ namespace BaseAPI.Application.Features.Estudiantes._Shared.Contracts
             string nombre, string apellido, string identificacion,
             string? correo,string programa, int anioMatricula,
             CancellationToken cancellationToken = default);
-        Task<Result<List<EstudiantesDTO>>> ListarEstudiantesAsync(object cancellationToken);
+        //Task<Result<List<EstudiantesDTO>>> ListarEstudiantesAsync(object cancellationToken);
     }
 }
