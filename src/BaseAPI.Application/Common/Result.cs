@@ -1,4 +1,4 @@
-﻿// — Espacio de nombres compartido con ErrorCodes
+// — Espacio de nombres compartido con ErrorCodes
 namespace BaseAPI.Application.Common;
 
 // ═══════════════════════════════════════════════════════════════

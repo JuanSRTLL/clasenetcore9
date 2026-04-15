@@ -1,4 +1,4 @@
-﻿// — Definimos el espacio de nombres donde vive este archivo
+// — Definimos el espacio de nombres donde vive este archivo
 namespace BaseAPI.Application.Common;
 
 // — "static class" significa que esta clase NO se puede instanciar

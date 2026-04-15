@@ -1,9 +1,8 @@
-using System.Text.Json.Serialization;
-using BaseAPI.API.Middelware;
-
 using BaseAPI.Application;
 using BaseAPI.Infrastructure;
+using BaseAPI.API.Middleware;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 // ============================================================
 // Program.cs — Punto de entrada de la aplicación ASP.NET Core
@@ -93,7 +92,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplication();
 
 // Infrastructure Layer: Oracle, Repositories
-builder.Services.AddInfraestructureServices(builder.Configuration);
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // ============================================================
 // BUILD — Construir la aplicación
@@ -106,7 +105,7 @@ var app = builder.Build();
 // ============================================================
 
 // 1. EXCEPCIÓN HANDLING — Atrapar cualquier excepción no controlada
-app.UseMiddleware<ExceptionHandingMiddelware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // 2. SWAGGER — Solo disponible en desarrollo
 if (app.Environment.IsDevelopment())

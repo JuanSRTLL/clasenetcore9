@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;   // — IActionResult, OkObjectResult, NotFoundObjectResult, etc. (las respuestas HTTP)
+using Microsoft.AspNetCore.Mvc;   // — IActionResult, OkObjectResult, NotFoundObjectResult, etc. (las respuestas HTTP)
 using BaseAPI.Application.Common; // — Result<T>, Error, ErrorCodes (vienen de la capa Application)
 using BaseAPI.API.Models;         // — ApiResponse<T> (el formato JSON que envolvemos en cada respuesta)
 
@@ -22,7 +22,7 @@ public static class ResultExtensions
     // — string? successMessage: el "?" significa que es opcional (puede ser null).
     // — Si no pasas mensaje, usa "Operación exitosa" por defecto.
     public static IActionResult ToActionResult<T>(
-        this Result<T> result,
+        this Result<T> result, 
         string? successMessage = null)
     {
         // — result.IsSuccess: propiedad de Result<T> que indica si el Handler retornó éxito.
@@ -106,24 +106,24 @@ public static class ResultExtensions
             // — Resultado: { "exitoso": false, "mensaje": "No se encontró el estudiante", ... }
             ErrorCodes.NotFound => new NotFoundObjectResult(
                 ApiResponse<T>.Failure(error.Message)),
-
+            
             // — Si error.Code == "VALIDATION" → retorna HTTP 400 Bad Request
             // — Esto es lo que llega cuando ValidationBehavior detecta errores.
             // — error.Message contiene: "El nombre es obligatorio; El apellido es obligatorio; ..."
             ErrorCodes.Validation => new BadRequestObjectResult(
                 ApiResponse<T>.Failure(error.Message)),
-
+            
             // — Si error.Code == "CONFLICT" → retorna HTTP 409 Conflict
             // — Ej: intentar crear un estudiante con un código que ya existe en la BD.
             ErrorCodes.Conflict => new ConflictObjectResult(
                 ApiResponse<T>.Failure(error.Message)),
-
+            
             // — Si error.Code == "INTERNAL_ERROR" → retorna HTTP 500
             // — ObjectResult + StatusCode manual porque no existe "InternalServerErrorObjectResult".
             ErrorCodes.InternalError => new ObjectResult(
                 ApiResponse<T>.Failure(error.Message))
             { StatusCode = StatusCodes.Status500InternalServerError },
-
+            
             // — _ = "default" o "cualquier otro caso". Si llega un código que no conocemos → 500.
             // — Es una red de seguridad: si alguien agrega un ErrorCode nuevo y no lo mapea aquí,
             // — al menos retorna 500 en vez de romper la aplicación.

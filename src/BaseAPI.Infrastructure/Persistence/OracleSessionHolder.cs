@@ -1,4 +1,4 @@
-﻿// — Importamos DbConnection y DbTransaction de System.Data.Common
+// — Importamos DbConnection y DbTransaction de System.Data.Common
 // — Son tipos genéricos que representan conexión/transacción de cualquier BD
 using System.Data.Common;
 // — Importamos las interfaces de sesión que definimos en Clase 1

@@ -1,4 +1,4 @@
-﻿// — Importamos DbConnection y DbTransaction de System.Data.Common
+// — Importamos DbConnection y DbTransaction de System.Data.Common
 using System.Data.Common;
 // — Importamos IConfiguration para leer el connection string de appsettings.json
 using Microsoft.Extensions.Configuration;

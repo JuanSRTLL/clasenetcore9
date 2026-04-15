@@ -1,4 +1,5 @@
-﻿// — Importamos Result y Result<T> de Common
+// !! Result.cs (Application/Common) — importamos Result<T> y Result
+// — Referencia: src/BaseAPI.Application/Common/Result.cs
 using BaseAPI.Application.Common;
 
 // — Espacio de nombres de contratos de persistencia

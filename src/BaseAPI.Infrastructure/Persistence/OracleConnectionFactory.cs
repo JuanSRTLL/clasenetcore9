@@ -1,4 +1,4 @@
-﻿// — Importamos IConfiguration para leer el connection string de appsettings.json
+// — Importamos IConfiguration para leer el connection string de appsettings.json
 using Microsoft.Extensions.Configuration;
 // — Importamos ILogger para registrar mensajes de depuración y error
 using Microsoft.Extensions.Logging;

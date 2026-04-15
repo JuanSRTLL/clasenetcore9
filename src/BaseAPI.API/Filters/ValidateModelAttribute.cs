@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;         // — BadRequestObjectResult (para generar HTTP 400)
+using Microsoft.AspNetCore.Mvc;         // — BadRequestObjectResult (para generar HTTP 400)
 using Microsoft.AspNetCore.Mvc.Filters; // — ActionFilterAttribute, ActionExecutingContext (sistema de filtros de ASP.NET)
 using BaseAPI.Application.Common;       // — Por si se necesita ErrorCodes en futuro
 using BaseAPI.API.Models;               // — ApiResponse<T> (formato JSON estándar de nuestras respuestas)

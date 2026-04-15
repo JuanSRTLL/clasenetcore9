@@ -1,4 +1,4 @@
-﻿// !! MediatR (NuGet) — IMediator para enviar Queries al pipeline
+// !! MediatR (NuGet) — IMediator para enviar Queries al pipeline
 using MediatR;
 // — ASP.NET Core MVC: ControllerBase, atributos de routing
 using Microsoft.AspNetCore.Mvc;

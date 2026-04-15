@@ -1,4 +1,4 @@
-﻿// !! MediatR (NuGet) — IMediator para enviar Queries y Commands al pipeline
+// !! MediatR (NuGet) — IMediator para enviar Queries y Commands al pipeline
 using MediatR;
 // — ASP.NET Core MVC: ControllerBase, atributos de routing, IActionResult
 using Microsoft.AspNetCore.Mvc;
@@ -72,7 +72,7 @@ public class EstudiantesController : ControllerBase
         // !! EstudiantesDTOs.cs (Clase 2, sección 1.1) — DTO que representa el body JSON
         // — [FromBody]: ASP.NET lee el body de la petición y lo convierte en este DTO
         // — Si el JSON no coincide con el DTO → ValidateModelAttribute retorna 400
-        [FromBody] CrearEstudianteRequestDTO request,
+        [FromBody] CrearEstudianteRequestDto request,
         CancellationToken cancellationToken)
     {
         // !! CrearEstudianteCommand.cs (Clase 2, sección 3.1) — mensaje de escritura
@@ -82,7 +82,7 @@ public class EstudiantesController : ControllerBase
         // —   2. El Command podría agregar datos que no vienen del DTO (ej: usuario autenticado)
         // —   3. Separación clara entre "qué recibe la API" y "qué procesa Application"
         var command = new CrearEstudianteCommand(
-            request.Nombre, request.Apellido, request.Identicacion,
+            request.Nombre, request.Apellido, request.Identificacion,
             request.Correo, request.Programa, request.AnioMatricula);
 
         // !! MediatR (NuGet) — Send() envía el Command al pipeline:
